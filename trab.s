@@ -16,16 +16,23 @@ Vitor Grabski - RA
     area_str: .asciz "Metragem total: "
     rent_str: .asciz "Valor do aluguel: "
 
-    num_str: .asciz "%d%*c"
+    num_str: .asciz "%d%*c"  # joga fora newline do buffer
     nl_str: .asciz "\n"
     str_display: .asciz "%s\n"
+    num_display: .asciz "%d\n"
 
     choice: .int 0
     name_input: .space 32
     cell_input: .space 32
+    property_input: .space 32
+    address_input: .space 32
+    rooms_input: .int 0
+    garage_input: .space 8
+    area_input: .int 0
+    rent_input: .int 0
 
     head: .int 0
-    node_size: .int 68
+    node_size: .int 152
 
 .section .bss
 .section .text
@@ -89,6 +96,69 @@ insert:
     call fgets
     addl $12, %esp
 
+    # get property type
+    pushl $property_str
+    call printf
+    addl $4, %esp
+
+    pushl stdin
+    pushl $32
+    pushl $property_input
+    call fgets
+    addl $12, %esp
+
+    # get address
+    pushl $address_str
+    call printf
+    addl $4, %esp
+
+    pushl stdin
+    pushl $32
+    pushl $address_input
+    call fgets
+    addl $12, %esp
+
+    # get rooms
+    pushl $rooms_str
+    call printf
+    addl $4, %esp
+
+    pushl $rooms_input
+    pushl $num_str
+    call scanf
+    addl $8, %esp
+
+    # get garage
+    pushl $garage_str
+    call printf
+    addl $4, %esp
+
+    pushl stdin
+    pushl $32
+    pushl $garage_input
+    call fgets
+    addl $12, %esp
+
+    # get area
+    pushl $area_str
+    call printf
+    addl $4, %esp
+
+    pushl $area_input
+    pushl $num_str
+    call scanf
+    addl $8, %esp
+
+    # get rent
+    pushl $rent_str
+    call printf
+    addl $4, %esp
+
+    pushl $rent_input
+    pushl $num_str
+    call scanf
+    addl $8, %esp
+
     # inserts all in node in list
     call ll_insert
 
@@ -138,6 +208,34 @@ ll_insert:
     movl $32, %ecx
     rep movsb
 
+    # insert property type
+    movl $property_input, %esi
+    movl $32, %ecx
+    rep movsb
+
+    # insert address
+    movl $address_input, %esi
+    movl $32, %ecx
+    rep movsb
+
+    # insert rooms
+    movl rooms_input, %eax  # mem with mem
+    movl %eax, (%edi)
+
+    # insert garage
+    movl $garage_input, %esi
+    addl $4, %edi  # skip rooms field
+    movl $8, %ecx
+    rep movsb
+
+    # insert area
+    movl area_input, %eax  # mem with mem
+    movl %eax, (%edi)
+
+    # insert rent
+    movl rent_input, %eax  # mem with mem
+    movl %eax, 4(%edi)
+
     ret
 
 ll_print:
@@ -147,7 +245,7 @@ ll_print:
     pushl %esi  # back up start of node
     addl $4, %esi
 
-    # move strings from struct to inputs
+    # [start] move strings from struct to inputs ------------------------------
     movl $name_input, %edi
     movl $32, %ecx
     rep movsb  # changes value of esi, hence backup
@@ -156,14 +254,74 @@ ll_print:
     movl $32, %ecx
     rep movsb
 
-    # print string
+    movl $property_input, %edi
+    movl $32, %ecx
+    rep movsb
+
+    movl $address_input, %edi
+    movl $32, %ecx
+    rep movsb
+
+    movl (%esi), %eax  # mem with mem
+    movl %eax, rooms_input
+
+    addl $4, %esi  # skip rooms field
+    movl $garage_input, %edi
+    movl $8, %ecx
+    rep movsb
+
+    movl (%esi), %eax  # mem with mem
+    movl %eax, area_input
+
+    movl 4(%esi), %eax  # mem with mem
+    movl %eax, rent_input
+    # [end] move strings from struct to inputs --------------------------------
+
+    # print name
     pushl $name_input
     pushl $str_display
     call printf
     addl $8, %esp
 
+    # print cell
     pushl $cell_input
     pushl $str_display
+    call printf
+    addl $8, %esp
+
+    # print property type
+    pushl $property_input
+    pushl $str_display
+    call printf
+    addl $8, %esp
+
+    # print address
+    pushl $address_input
+    pushl $str_display
+    call printf
+    addl $8, %esp
+
+    # print rooms
+    pushl rooms_input
+    pushl $num_display
+    call printf
+    addl $8, %esp
+
+    # print garage
+    pushl $garage_input
+    pushl $str_display
+    call printf
+    addl $8, %esp
+
+    # print area
+    pushl area_input
+    pushl $num_display
+    call printf
+    addl $8, %esp
+
+    # print rent
+    pushl rent_input
+    pushl $num_display
     call printf
     addl $8, %esp
 
