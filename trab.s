@@ -16,8 +16,7 @@ Vitor Grabski - RA
     area_str: .asciz "Metragem total: "
     rent_str: .asciz "Valor do aluguel: "
 
-    num_str: .asciz "%d"
-    str_str: .asciz "%s"
+    num_str: .asciz "%d%*c"
     nl_str: .asciz "\n"
     str_display: .asciz "%s\n"
 
@@ -73,20 +72,22 @@ insert:
     call printf
     addl $4, %esp
 
+    pushl stdin
+    pushl $32
     pushl $name_input
-    pushl $str_str
-    call scanf
-    addl $8, %esp
+    call fgets
+    addl $12, %esp
 
     # get cell phone
     pushl $cell_str
     call printf
     addl $4, %esp
 
+    pushl stdin
+    pushl $32
     pushl $cell_input
-    pushl $str_str
-    call scanf
-    addl $8, %esp
+    call fgets
+    addl $12, %esp
 
     # inserts all in node in list
     call ll_insert
