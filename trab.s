@@ -583,6 +583,10 @@ load:
 report:
     movl head, %esi
 
+    # return if no records
+    cmpl $0, head
+    je _end_print
+
     _loop1:
     pushl %esi  # back up start of node
     addl $4, %esi
