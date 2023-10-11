@@ -66,6 +66,8 @@ menu:
     je insert
     cmpl $2, choice
     je remove
+    cmpl $3, choice
+    je query
     cmpl $6, choice
     je report
 
@@ -271,6 +273,126 @@ remove:
     pushl %edi
     call free
     addl $4, %esp
+
+    ret
+
+query:
+    # get rooms
+    pushl $rooms_str
+    call printf
+    addl $4, %esp
+    pushl $rooms_input
+    pushl $num_str
+    call scanf
+    addl $8, %esp
+
+    movl head, %esi
+
+    _loop2:
+    # print if query satisfied, else loop
+    movl rooms_input, %eax
+    cmpl %eax, 132(%esi)
+    jne _skip_print
+
+    pushl %esi  # back up start of node
+    addl $4, %esi
+
+    # [start] move strings from struct to inputs ------------------------------
+    movl $name_input, %edi
+    movl $32, %ecx
+    rep movsb  # changes value of esi, hence backup
+
+    movl $cell_input, %edi
+    movl $32, %ecx
+    rep movsb
+
+    movl $property_input, %edi
+    movl $32, %ecx
+    rep movsb
+
+    movl $address_input, %edi
+    movl $32, %ecx
+    rep movsb
+
+    movl (%esi), %eax  # mem with mem
+    movl %eax, rooms_input
+
+    addl $4, %esi  # skip rooms field
+    movl $garage_input, %edi
+    movl $8, %ecx
+    rep movsb
+
+    movl (%esi), %eax  # mem with mem
+    movl %eax, area_input
+
+    movl 4(%esi), %eax  # mem with mem
+    movl %eax, rent_input
+    # [end] move strings from struct to inputs --------------------------------
+
+    # print name
+    pushl $name_input
+    pushl $str_display
+    call printf
+    addl $8, %esp
+
+    # print cell
+    pushl $cell_input
+    pushl $str_display
+    call printf
+    addl $8, %esp
+
+    # print property type
+    pushl $property_input
+    pushl $str_display
+    call printf
+    addl $8, %esp
+
+    # print address
+    pushl $address_input
+    pushl $str_display
+    call printf
+    addl $8, %esp
+
+    # print rooms
+    pushl rooms_input
+    pushl $num_display
+    call printf
+    addl $8, %esp
+
+    # print garage
+    pushl $garage_input
+    pushl $str_display
+    call printf
+    addl $8, %esp
+
+    # print area
+    pushl area_input
+    pushl $num_display
+    call printf
+    addl $8, %esp
+
+    # print rent
+    pushl rent_input
+    pushl $num_display
+    call printf
+    addl $8, %esp
+
+    popl %esi  # restore start of node
+
+    _skip_print:
+    # next node if exists
+    cmpl $0, (%esi)
+    je _end_print1
+
+    movl (%esi), %esi  # next node
+
+    # print nl
+    pushl $nl_str
+    call printf
+    addl $4, %esp
+
+    jmp _loop2  # print again
+    _end_print1:
 
     ret
 
