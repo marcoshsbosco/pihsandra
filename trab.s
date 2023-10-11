@@ -34,7 +34,12 @@ Vitor Grabski - RA
     head: .int 0
     node_size: .int 152
 
+    filename: .asciz "records.dat"
+
 .section .bss
+    .lcomm filehandle, 4
+    .lcomm buffer, 152
+
 .section .text
 .globl _start
 _start:
@@ -68,6 +73,8 @@ menu:
     je remove
     cmpl $3, choice
     je query
+    cmpl $4, choice
+    je save
     cmpl $6, choice
     je report
 
@@ -292,7 +299,7 @@ query:
     # print if query satisfied, else loop
     movl rooms_input, %eax
     cmpl %eax, 132(%esi)
-    jne _skip_print
+    jne _skip_print  # if not number of rooms
 
     pushl %esi  # back up start of node
     addl $4, %esi
@@ -393,6 +400,39 @@ query:
 
     jmp _loop2  # print again
     _end_print1:
+
+    ret
+
+save:
+    # open file for write
+    movl $5, %eax
+    movl $filename, %ebx
+    movl $11101, %ecx
+    movl $0777, %edx
+    int $0x80
+    movl %eax, filehandle
+
+    movl head, %esi
+
+    _loop3:
+    # write node to file
+    movl $4, %eax
+    movl filehandle, %ebx
+    movl %esi, %ecx
+    movl node_size, %edx
+    int $0x80
+
+    # next node if exists
+    cmpl $0, (%esi)
+    je _end_save
+    movl (%esi), %esi  # next node
+    jmp _loop3  # write to file again
+    _end_save:
+
+    # close file
+    movl $6, %eax
+    movl $filename, %ebx
+    int $0x80
 
     ret
 
