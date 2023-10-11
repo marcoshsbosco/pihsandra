@@ -87,7 +87,7 @@ quit:
     call exit
 
 insert:
-    # get name
+    # get name ----------------------------------------------------------------
     pushl $name_str
     call printf
     addl $4, %esp
@@ -98,7 +98,18 @@ insert:
     call fgets
     addl $12, %esp
 
-    # get cell phone
+    # get string length
+    pushl $name_input
+    call strlen  # returns first NUL offset
+    addl $4, %esp
+
+    # remove newline
+    subl $1, %eax  # set offset to newline
+    movl $name_input, %edi
+    addl %eax, %edi  # offsets string address to newline address
+    movb $0, (%edi)  # replaces newline with NUL
+
+    # get cell phone ----------------------------------------------------------
     pushl $cell_str
     call printf
     addl $4, %esp
@@ -109,7 +120,18 @@ insert:
     call fgets
     addl $12, %esp
 
-    # get property type
+    # get string length
+    pushl $cell_input
+    call strlen  # returns first NUL offset
+    addl $4, %esp
+
+    # remove newline
+    subl $1, %eax  # set offset to newline
+    movl $cell_input, %edi
+    addl %eax, %edi  # offsets string address to newline address
+    movb $0, (%edi)  # replaces newline with NUL
+
+    # get property type -------------------------------------------------------
     pushl $property_str
     call printf
     addl $4, %esp
@@ -120,7 +142,18 @@ insert:
     call fgets
     addl $12, %esp
 
-    # get address
+    # get string length
+    pushl $property_input
+    call strlen  # returns first NUL offset
+    addl $4, %esp
+
+    # remove newline
+    subl $1, %eax  # set offset to newline
+    movl $property_input, %edi
+    addl %eax, %edi  # offsets string address to newline address
+    movb $0, (%edi)  # replaces newline with NUL
+
+    # get address -------------------------------------------------------------
     pushl $address_str
     call printf
     addl $4, %esp
@@ -131,7 +164,18 @@ insert:
     call fgets
     addl $12, %esp
 
-    # get rooms
+    # get string length
+    pushl $address_input
+    call strlen  # returns first NUL offset
+    addl $4, %esp
+
+    # remove newline
+    subl $1, %eax  # set offset to newline
+    movl $address_input, %edi
+    addl %eax, %edi  # offsets string address to newline address
+    movb $0, (%edi)  # replaces newline with NUL
+
+    # get rooms ---------------------------------------------------------------
     pushl $rooms_str
     call printf
     addl $4, %esp
@@ -141,7 +185,7 @@ insert:
     call scanf
     addl $8, %esp
 
-    # get garage
+    # get garage --------------------------------------------------------------
     pushl $garage_str
     call printf
     addl $4, %esp
@@ -152,7 +196,18 @@ insert:
     call fgets
     addl $12, %esp
 
-    # get area
+    # get string length
+    pushl $garage_input
+    call strlen  # returns first NUL offset
+    addl $4, %esp
+
+    # remove newline
+    subl $1, %eax  # set offset to newline
+    movl $garage_input, %edi
+    addl %eax, %edi  # offsets string address to newline address
+    movb $0, (%edi)  # replaces newline with NUL
+
+    # get area ----------------------------------------------------------------
     pushl $area_str
     call printf
     addl $4, %esp
@@ -162,7 +217,7 @@ insert:
     call scanf
     addl $8, %esp
 
-    # get rent
+    # get rent ----------------------------------------------------------------
     pushl $rent_str
     call printf
     addl $4, %esp
