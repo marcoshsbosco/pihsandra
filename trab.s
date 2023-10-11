@@ -64,8 +64,10 @@ menu:
     je quit
     cmpl $1, choice
     je insert
+    cmpl $2, choice
+    je remove
     cmpl $6, choice
-    je ll_print
+    je report
 
     ret
 
@@ -238,7 +240,41 @@ ll_insert:
 
     ret
 
-ll_print:
+remove:
+    movl head, %edi
+    movl $0, %esi
+
+    # check if last node
+    _traverse1:
+    cmpl $0, (%edi)
+    je _last_node1
+
+    # next node
+    movl %edi, %esi  # store 2nd to last node
+    movl (%edi), %edi
+    jmp _traverse1
+
+    # set "next" to 0 for 2nd to last node
+    _last_node1:
+    cmpl $0, %esi
+    je _skip_next1  # if only 1 node
+    movl $0, (%esi)
+    _skip_next1:
+
+    #set head to 0 if only 1 node
+    cmpl $0, %esi
+    jne _skip_head1  # if more than 1 node
+    movl $0, head
+    _skip_head1:
+
+    # free last node pointer
+    pushl %edi
+    call free
+    addl $4, %esp
+
+    ret
+
+report:
     movl head, %esi
 
     _loop1:
