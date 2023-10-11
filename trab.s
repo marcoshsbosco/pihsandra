@@ -75,6 +75,8 @@ menu:
     je query
     cmpl $4, choice
     je save
+    cmpl $5, choice
+    je load
     cmpl $6, choice
     je report
 
@@ -424,10 +426,61 @@ save:
 
     # next node if exists
     cmpl $0, (%esi)
-    je _end_save
+    je _end_save  # if no next node, don't iterate again
     movl (%esi), %esi  # next node
     jmp _loop3  # write to file again
     _end_save:
+
+    # close file
+    movl $6, %eax
+    movl $filename, %ebx
+    int $0x80
+
+    ret
+
+load:
+    # open file for read
+    movl $5, %eax
+    movl $filename, %ebx
+    movl $00, %ecx
+    movl $0777, %edx
+    int $0x80
+    movl %eax, filehandle
+
+    movl $0, head  # reset head
+
+    _loop4:
+    # create node
+    pushl node_size
+    call malloc
+    addl $4, %esp
+    movl %eax, %edi
+
+    # set previous next pointer
+    cmpl $0, head
+    je _skip_next2
+    movl %edi, (%esi)  # esi contains previous node's address
+    _skip_next2:
+
+    # set head if not set
+    cmpl $0, head
+    jne _skip_head2
+    movl %eax, head
+    _skip_head2:
+
+    # write to newly allocated memory
+    movl $3, %eax
+    movl filehandle, %ebx
+    movl %edi, %ecx
+    movl node_size, %edx
+    int $0x80
+
+    # next node if exists
+    cmpl $0, (%edi)
+    je _end_save2  # if no next node, don't iterate again
+    movl %edi, %esi  # save last node in esi for next iteration
+    jmp _loop4  # read next node
+    _end_save2:
 
     # close file
     movl $6, %eax
