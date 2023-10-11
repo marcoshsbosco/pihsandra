@@ -15,6 +15,9 @@ Vitor Grabski - RA
     garage_str: .asciz "Garagem: "
     area_str: .asciz "Metragem total: "
     rent_str: .asciz "Valor do aluguel: "
+    save_success: .asciz "Registros salvos com sucesso!\n"
+    load_success: .asciz "Registros carregados com sucesso!\n"
+    remove_success: .asciz "Último registro removido com sucesso!\n"
 
     num_str: .asciz "%d%*c"  # joga fora newline do buffer
     nl_str: .asciz "\n"
@@ -338,6 +341,11 @@ remove:
     call free
     addl $4, %esp
 
+    # success message
+    pushl $remove_success
+    call printf
+    addl $4, %esp
+
     ret
 
 query:
@@ -394,48 +402,72 @@ query:
     # [end] move strings from struct to inputs --------------------------------
 
     # print name
+    pushl $name_str
+    call printf
+    addl $4, %esp
     pushl $name_input
     pushl $str_display
     call printf
     addl $8, %esp
 
     # print cell
+    pushl $cell_str
+    call printf
+    addl $4, %esp
     pushl $cell_input
     pushl $str_display
     call printf
     addl $8, %esp
 
     # print property type
+    pushl $property_str
+    call printf
+    addl $4, %esp
     pushl $property_input
     pushl $str_display
     call printf
     addl $8, %esp
 
     # print address
+    pushl $address_str
+    call printf
+    addl $4, %esp
     pushl $address_input
     pushl $str_display
     call printf
     addl $8, %esp
 
     # print rooms
+    pushl $rooms_str
+    call printf
+    addl $4, %esp
     pushl rooms_input
     pushl $num_display
     call printf
     addl $8, %esp
 
     # print garage
+    pushl $garage_str
+    call printf
+    addl $4, %esp
     pushl $garage_input
     pushl $str_display
     call printf
     addl $8, %esp
 
     # print area
+    pushl $area_str
+    call printf
+    addl $4, %esp
     pushl area_input
     pushl $num_display
     call printf
     addl $8, %esp
 
     # print rent
+    pushl $rent_str
+    call printf
+    addl $4, %esp
     pushl rent_input
     pushl $num_display
     call printf
@@ -449,11 +481,6 @@ query:
     je _end_print1
 
     movl (%esi), %esi  # next node
-
-    # print nl
-    pushl $nl_str
-    call printf
-    addl $4, %esp
 
     jmp _loop2  # print again
     _end_print1:
@@ -490,6 +517,11 @@ save:
     movl $6, %eax
     movl $filename, %ebx
     int $0x80
+
+    # success message
+    pushl $save_success
+    call printf
+    addl $4, %esp
 
     ret
 
@@ -542,6 +574,10 @@ load:
     movl $filename, %ebx
     int $0x80
 
+    pushl $load_success
+    call printf
+    addl $4, %esp
+
     ret
 
 report:
@@ -584,48 +620,72 @@ report:
     # [end] move strings from struct to inputs --------------------------------
 
     # print name
+    pushl $name_str
+    call printf
+    addl $4, %esp
     pushl $name_input
     pushl $str_display
     call printf
     addl $8, %esp
 
     # print cell
+    pushl $cell_str
+    call printf
+    addl $4, %esp
     pushl $cell_input
     pushl $str_display
     call printf
     addl $8, %esp
 
     # print property type
+    pushl $property_str
+    call printf
+    addl $4, %esp
     pushl $property_input
     pushl $str_display
     call printf
     addl $8, %esp
 
     # print address
+    pushl $address_str
+    call printf
+    addl $4, %esp
     pushl $address_input
     pushl $str_display
     call printf
     addl $8, %esp
 
     # print rooms
+    pushl $rooms_str
+    call printf
+    addl $4, %esp
     pushl rooms_input
     pushl $num_display
     call printf
     addl $8, %esp
 
     # print garage
+    pushl $garage_str
+    call printf
+    addl $4, %esp
     pushl $garage_input
     pushl $str_display
     call printf
     addl $8, %esp
 
     # print area
+    pushl $area_str
+    call printf
+    addl $4, %esp
     pushl area_input
     pushl $num_display
     call printf
     addl $8, %esp
 
     # print rent
+    pushl $rent_str
+    call printf
+    addl $4, %esp
     pushl rent_input
     pushl $num_display
     call printf
