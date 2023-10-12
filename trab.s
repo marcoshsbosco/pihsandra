@@ -261,6 +261,7 @@ ll_insert:
     pushl node_size
     call malloc
     addl $4, %esp
+    movl $0, (%eax)  # clears "next" pointer in case of preceding remove execution
 
     # set head
     cmpl $0, %esi
@@ -324,11 +325,11 @@ ll_insert:
     ret
 
 remove:
-    movl head, %edi
     movl $0, %esi
+    movl head, %edi
 
-    # check if last node
     _traverse1:
+    # check if last node
     cmpl $0, (%edi)
     je _last_node1
 
