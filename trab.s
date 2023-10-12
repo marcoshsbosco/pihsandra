@@ -236,16 +236,23 @@ insert:
     ret
 
 ll_insert:
+    movl $0, %esi  # trailing edi
     movl head, %edi
 
-    # check if last node
+    # check if no nodes
     cmpl $0, head
     je _link
+
     _traverse:
-    cmpl $0, (%edi)
-    je _link
+    # check if correct position based on number of rooms
+    cmpl $0, %edi
+    je _link  # if new node is last
+    movl rooms_input, %eax
+    cmpl %eax, 132(%edi)  # new node's rooms greater than next node
+    jle _link  # new node between nodes at esi and edi
 
     # next node
+    movl %edi, %esi
     movl (%edi), %edi
     jmp _traverse
 
@@ -255,17 +262,24 @@ ll_insert:
     call malloc
     addl $4, %esp
 
-    # set head if new list
-    cmpl $0, head
-    jne _skip_head
+    # set head
+    cmpl $0, %esi
+    jne _skip_head  # no head to set because new node is not first element
     movl %eax, head
+    jmp _skip_next  # new node is first element, no previous node's "next" to set
     _skip_head:
 
-    # set last node's "next"
-    cmpl $0, %edi
+    # set previous node's "next"
+    cmpl $0, %esi
     je _skip_next
-    movl %eax, (%edi)
+    movl %eax, (%esi)  # new node as previous node's next
     _skip_next:
+
+    # set new node's "next"
+    cmpl $0, %edi
+    je _skip_next3
+    movl %edi, (%eax)  # previous node's next to new node's next
+    _skip_next3:
 
     # insert name
     movl $name_input, %esi
